@@ -45,7 +45,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.constraintlayout)
     implementation(libs.microsoft.graph)
-    implementation(libs.azure.identity)
+    implementation(libs.microsoft.identity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

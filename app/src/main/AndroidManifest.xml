@@ -25,6 +25,20 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.microsoft.identity.client.BrowserTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="msauth"
+                    android:host="ch.nikleberg.bettershared"
+                    android:path="/C5sTxQ2SAAcim6dMTwI+hJ6sCo4=" />
+            </intent-filter>
+        </activity>
+
         <provider
             android:name=".cp.Provider"
             android:authorities="ch.nikleberg.bettershared"

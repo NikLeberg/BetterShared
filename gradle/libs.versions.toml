@@ -8,7 +8,7 @@ material = "1.12.0"
 activity = "1.9.3"
 constraintlayout = "2.2.0"
 microsoftGraph = "6.27.0"
-azureIdentity = "1.13.0"
+microsoftIdentity = "5.9.0"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -19,7 +19,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 microsoft-graph = { group = "com.microsoft.graph", name = "microsoft-graph", version.ref = "microsoftGraph" }
-azure-identity = { group = "com.azure", name = "azure-identity", version.ref = "azureIdentity" }
+microsoft-identity = { group = "com.microsoft.identity.client", name = "msal", version.ref = "microsoftIdentity" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
