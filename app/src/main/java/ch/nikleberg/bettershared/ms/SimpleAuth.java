@@ -2,6 +2,7 @@ package ch.nikleberg.bettershared.ms;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -17,8 +18,12 @@ import com.microsoft.identity.client.SignInParameters;
 import com.microsoft.identity.client.SilentAuthenticationCallback;
 import com.microsoft.identity.client.exception.MsalClientException;
 import com.microsoft.identity.client.exception.MsalException;
+import com.microsoft.kiota.RequestInformation;
+import com.microsoft.kiota.authentication.AuthenticationProvider;
 
+import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -26,13 +31,18 @@ import java.util.function.Supplier;
 import ch.nikleberg.bettershared.R;
 
 public class SimpleAuth {
-    final public String TAG = SimpleAuth.class.getSimpleName();
+    public final String TAG = SimpleAuth.class.getSimpleName();
 
-    public SimpleAuth(Context context, List<String> scopes, Supplier<CompletableFuture<Activity>> getActivity, Consumer<SimpleAuthProvider> onAuthentication, Consumer<Exception> onError) {
-        createApp(context, app -> loadAccount(app,
-                account -> authenticateSilent(app, account, scopes, onAuthentication, onError),
+    public SimpleAuth(Context appContext, List<String> scopes, Supplier<CompletableFuture<Activity>> getActivity, Consumer<Provider> onAuthenticated, Consumer<Exception> onError) {
+        // 1. Create an MSAL application.
+        // 2. Load user account.
+        // 3. If account could be loaded, authenticate silently.
+        // 4. Else, authenticate interactively.
+        // TODO: Shall we do the interactive auth when silent auth fails?
+        createApp(appContext, app -> loadAccount(app,
+                account -> authenticateSilent(app, account, scopes, onAuthenticated, onError),
                 ex -> getActivity.get().thenAccept(activity ->
-                        authenticateInteractive(app, activity, scopes, onAuthentication, onError))), onError);
+                        authenticateInteractive(app, activity, scopes, onAuthenticated, onError))), onError);
     }
 
     private void createApp(Context context, Consumer<ISingleAccountPublicClientApplication> onCreated, Consumer<Exception> onError) {
@@ -74,27 +84,27 @@ public class SimpleAuth {
         });
     }
 
-    private void authenticateSilent(ISingleAccountPublicClientApplication app, IAccount account, List<String> scopes, Consumer<SimpleAuthProvider> onAuthentication, Consumer<Exception> onError) {
-        final AcquireTokenSilentParameters.Builder builder = new AcquireTokenSilentParameters.Builder()
+    private void authenticateSilent(ISingleAccountPublicClientApplication app, IAccount account, List<String> scopes, Consumer<Provider> onAuthenticated, Consumer<Exception> onError) {
+        final AcquireTokenSilentParameters params = new AcquireTokenSilentParameters.Builder()
                 .forAccount(account)
                 .fromAuthority(account.getAuthority())
                 .withScopes(scopes)
                 .withCallback(new SilentAuthenticationCallback() {
                     @Override
                     public void onSuccess(IAuthenticationResult authenticationResult) {
-                        onAuthentication.accept(new SimpleAuthProvider(authenticationResult.getAccessToken()));
+                        onAuthenticated.accept(new Provider(authenticationResult.getAccessToken()));
                     }
 
                     @Override
                     public void onError(MsalException exception) {
                         onError.accept(exception);
                     }
-                });
-        app.acquireTokenSilentAsync(builder.build());
+                }).build();
+        app.acquireTokenSilentAsync(params);
     }
 
-    private void authenticateInteractive(ISingleAccountPublicClientApplication app, Activity activity, List<String> scopes, Consumer<SimpleAuthProvider> onAuthentication, Consumer<Exception> onError) {
-        final SignInParameters.SignInParametersBuilder builder = SignInParameters.builder()
+    private void authenticateInteractive(ISingleAccountPublicClientApplication app, Activity activity, List<String> scopes, Consumer<Provider> onAuthenticated, Consumer<Exception> onError) {
+        final SignInParameters params = SignInParameters.builder()
                 .withActivity(activity)
                 .withScopes(scopes)
                 .withCallback(new AuthenticationCallback() {
@@ -105,14 +115,31 @@ public class SimpleAuth {
 
                     @Override
                     public void onSuccess(IAuthenticationResult authenticationResult) {
-                        onAuthentication.accept(new SimpleAuthProvider(authenticationResult.getAccessToken()));
+                        onAuthenticated.accept(new Provider(authenticationResult.getAccessToken()));
                     }
 
                     @Override
                     public void onError(MsalException exception) {
                         onError.accept(exception);
                     }
-                });
-        app.signIn(builder.build());
+                }).build();
+        app.signIn(params);
+    }
+
+    public static class Provider implements AuthenticationProvider {
+        final private String token;
+
+        public Provider(String token) {
+            this.token = token;
+        }
+
+        @Override
+        public void authenticateRequest(RequestInformation request, Map<String, Object> additionalAuthenticationContext) {
+            try {
+                if (null != request.getUri()) Log.d("SimpleAuth.Provider", request.getUri().toString());
+            } catch (URISyntaxException ignore) {
+            }
+            request.headers.add("Authorization", "Bearer " + token);
+        }
     }
 }
