@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/albumListFragment">
+
+    <fragment
+        android:id="@+id/albumListFragment"
+        android:name="ch.nikleberg.bettershared.gui.AlbumListFragment"
+        android:label="AlbumListFragment" >
+        <action
+            android:id="@+id/action_albumListFragment_to_albumEditFragment"
+            app:destination="@id/albumEditFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/albumEditFragment"
+        android:name="ch.nikleberg.bettershared.gui.AlbumEditFragment"
+        android:label="AlbumEditFragment" />
+</navigation>

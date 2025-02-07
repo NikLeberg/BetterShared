@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.microsoft.graph)
     implementation(libs.microsoft.identity)
     implementation(libs.room.runtime)
+    implementation(libs.navigation.fragment)
     annotationProcessor(libs.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)

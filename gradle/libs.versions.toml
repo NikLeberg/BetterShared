@@ -12,6 +12,7 @@ microsoftIdentity = "5.9.0"
 roomRuntime = "2.6.1"
 roomCompiler = "2.6.1"
 roomPlugin = "2.6.1"
+navigationFragment = "2.8.6"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -25,6 +26,8 @@ microsoft-graph = { group = "com.microsoft.graph", name = "microsoft-graph", ver
 microsoft-identity = { group = "com.microsoft.identity.client", name = "msal", version.ref = "microsoftIdentity" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
+navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
+room-plugin = { id = "androidx.room", version.ref = "roomPlugin" }

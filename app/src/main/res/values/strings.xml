@@ -1,5 +1,11 @@
 <resources>
     <string name="app_name">BetterShared</string>
+    <string name="album_name">Name</string>
+    <string name="drive_name">Drive</string>
+    <string name="album_save">Save Album</string>
+    <string name="album_delete">Delete Album</string>
+    <string name="folder_name">Folder</string>
+    <string name="action_settings">Settings</string>
     <string name="auth_login_request_message">Please log in to OneDrive</string>
     <string name="auth_login_success_message">Logged in as %1$s</string>
     <string name="auth_login_action">Log In</string>
