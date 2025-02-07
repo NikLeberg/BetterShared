@@ -9,6 +9,9 @@ activity = "1.9.3"
 constraintlayout = "2.2.0"
 microsoftGraph = "6.27.0"
 microsoftIdentity = "5.9.0"
+roomRuntime = "2.6.1"
+roomCompiler = "2.6.1"
+roomPlugin = "2.6.1"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -20,6 +23,8 @@ activity = { group = "androidx.activity", name = "activity", version.ref = "acti
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 microsoft-graph = { group = "com.microsoft.graph", name = "microsoft-graph", version.ref = "microsoftGraph" }
 microsoft-identity = { group = "com.microsoft.identity.client", name = "msal", version.ref = "microsoftIdentity" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomCompiler" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

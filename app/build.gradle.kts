@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.room.plugin)
 }
 
 android {
@@ -36,6 +37,14 @@ android {
             excludes += "/META-INF/{INDEX.LIST,AL2.0,LGPL2.1,io.netty.*}"
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    room {
+        schemaDirectory("$projectDir/schemas")
+    }
 }
 
 dependencies {
@@ -46,6 +55,8 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.microsoft.graph)
     implementation(libs.microsoft.identity)
+    implementation(libs.room.runtime)
+    annotationProcessor(libs.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
