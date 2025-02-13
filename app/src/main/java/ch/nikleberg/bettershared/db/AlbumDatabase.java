@@ -14,8 +14,10 @@ public abstract class AlbumDatabase extends RoomDatabase {
 
     public static synchronized AlbumDatabase getDatabase(final Context context) {
         if (INSTANCE == null) {
-            INSTANCE = Room.databaseBuilder(context, AlbumDatabase.class, "album_database")
+            INSTANCE = Room.inMemoryDatabaseBuilder(context, AlbumDatabase.class)
                     .build();
+            //INSTANCE = Room.databaseBuilder(context, AlbumDatabase.class, "album_database")
+            //        .build();
         }
         return INSTANCE;
     }

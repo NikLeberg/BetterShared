@@ -1,5 +1,6 @@
 package ch.nikleberg.bettershared.db;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -12,10 +13,10 @@ import java.util.List;
 @Dao
 public interface AlbumDao {
     @Query("SELECT * FROM album")
-    List<Album> getAll();
+    LiveData<List<Album>> getAlbums();
 
     @Query("SELECT * FROM album WHERE id = (:albumId)")
-    Album getById(long albumId);
+    LiveData<Album> getAlbum(long albumId);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insert(Album album);
