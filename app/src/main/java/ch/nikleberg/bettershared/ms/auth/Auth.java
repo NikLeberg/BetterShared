@@ -2,6 +2,7 @@ package ch.nikleberg.bettershared.ms.auth;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,7 @@ import com.microsoft.identity.client.SilentAuthenticationCallback;
 import com.microsoft.identity.client.exception.MsalClientException;
 import com.microsoft.identity.client.exception.MsalException;
 
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -89,6 +91,7 @@ public class Auth implements TokenProvider {
 
                         @Override
                         public void onError(MsalException exception) {
+                            Log.d("Auth", exception.getMessage());
                             future.completeExceptionally(exception);
                         }
                     }).build();
@@ -122,6 +125,7 @@ public class Auth implements TokenProvider {
 
                         @Override
                         public void onError(MsalException exception) {
+                            Log.d("Auth", exception.getMessage());
                             future.completeExceptionally(exception);
                         }
                     }).build();
@@ -139,8 +143,13 @@ public class Auth implements TokenProvider {
 
     @Override
     public IAuthenticationResult getAccessToken() {
-        authenticateSilent().join();
+        if (isTokenExpired())
+            authenticateSilent().join();
         return accessToken;
+    }
+
+    private boolean isTokenExpired() {
+        return (null == accessToken) || (accessToken.getExpiresOn().before(new Date()));
     }
 
     private void createApp() {
@@ -158,6 +167,7 @@ public class Auth implements TokenProvider {
 
                     @Override
                     public void onError(MsalException exception) {
+                        Log.d("Auth", exception.getMessage());
                         future.completeExceptionally(exception);
                     }
                 });
@@ -187,6 +197,7 @@ public class Auth implements TokenProvider {
 
             @Override
             public void onError(@NonNull MsalException exception) {
+                Log.d("Auth", exception.getMessage());
                 future.completeExceptionally(exception);
             }
         });
