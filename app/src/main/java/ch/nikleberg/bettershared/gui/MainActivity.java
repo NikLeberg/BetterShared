@@ -5,7 +5,6 @@ import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MenuProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.microsoft.graph.models.Folder;
@@ -19,7 +18,7 @@ import ch.nikleberg.bettershared.ms.DriveUtils;
 import ch.nikleberg.bettershared.ms.auth.Auth;
 import ch.nikleberg.bettershared.ms.auth.AuthProvider;
 
-public class MainActivity extends AppCompatActivity implements MenuProvider {
+public class MainActivity extends AppCompatActivity {
     public final String TAG = MainActivity.class.getSimpleName();
 
     private final Auth auth = Auth.getInstance();
