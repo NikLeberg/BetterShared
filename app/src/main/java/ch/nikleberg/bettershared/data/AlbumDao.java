@@ -1,4 +1,4 @@
-package ch.nikleberg.bettershared.db;
+package ch.nikleberg.bettershared.data;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
