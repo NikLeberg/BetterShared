@@ -36,7 +36,7 @@
 
                 <data
                     android:host="ch.nikleberg.bettershared"
-                    android:path="/C5sTxQ2SAAcim6dMTwI+hJ6sCo4="
+                    android:path="/z7grhBa/3ifSdvEjFyosZTMzwVg="
                     android:scheme="msauth" />
             </intent-filter>
         </activity>

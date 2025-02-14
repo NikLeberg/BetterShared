@@ -1,7 +1,7 @@
 {
   "client_id": "9cef345a-3cd5-4240-9de5-76a851bafe0b",
   "authorization_user_agent": "DEFAULT",
-  "redirect_uri": "msauth://ch.nikleberg.bettershared/C5sTxQ2SAAcim6dMTwI%2BhJ6sCo4%3D",
+  "redirect_uri": "msauth://ch.nikleberg.bettershared/z7grhBa%2F3ifSdvEjFyosZTMzwVg%3D",
   "broker_redirect_uri_registered": true,
   "account_mode": "SINGLE",
   "authorities": [
@@ -12,5 +12,10 @@
         "tenant_id": "common"
       }
     }
-  ]
+  ],
+  "logging": {
+    "pii_enabled": false,
+    "log_level": "VERBOSE",
+    "logcat_enabled": true
+  }
 }
