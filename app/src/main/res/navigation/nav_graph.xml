@@ -1,19 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
     app:startDestination="@id/albumListFragment">
 
     <fragment
         android:id="@+id/albumListFragment"
         android:name="ch.nikleberg.bettershared.gui.AlbumListFragment"
-        android:label="AlbumListFragment" >
+        android:label="AlbumListFragment"
+        tools:layout="@layout/fragment_album_list">
         <action
             android:id="@+id/action_albumListFragment_to_albumEditFragment"
             app:destination="@id/albumEditFragment" />
+        <action
+            android:id="@+id/action_albumListFragment_to_folderListFragment"
+            app:destination="@id/folderListFragment" />
     </fragment>
+
     <fragment
         android:id="@+id/albumEditFragment"
         android:name="ch.nikleberg.bettershared.gui.AlbumEditFragment"
-        android:label="AlbumEditFragment" />
+        android:label="AlbumEditFragment"
+        tools:layout="@layout/fragment_album_edit">
+        <argument
+            android:name="album_id"
+            app:argType="long" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/folderListFragment"
+        android:name="ch.nikleberg.bettershared.gui.FolderListFragment"
+        android:label="FolderListFragment"
+        tools:layout="@layout/fragment_folder_list">
+        <action
+            android:id="@+id/action_folderListFragment_self"
+            app:destination="@id/folderListFragment" />
+        <argument
+            android:name="folder_id"
+            android:defaultValue=""
+            app:argType="string" />
+    </fragment>
 </navigation>
