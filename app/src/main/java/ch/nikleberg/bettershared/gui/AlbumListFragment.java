@@ -3,7 +3,6 @@ package ch.nikleberg.bettershared.gui;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -33,13 +32,8 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         super(R.layout.fragment_album_list);
     }
 
-    //*************************
-    //** Lifecycle Callbacks **
-    //*************************
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d("AlbumListFragment", "onCreate");
         super.onCreate(savedInstanceState);
 
         setSharedTransition();
@@ -76,7 +70,6 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        Log.d("AlbumListFragment", "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         binding = FragmentAlbumListBinding.bind(view);
 
@@ -93,14 +86,12 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
 
     @Override
     public void onDestroyView() {
-        Log.d("AlbumListFragment", "onDestroyView");
         super.onDestroyView();
         binding = null;
     }
 
     @Override
     public void onDestroy() {
-        Log.d("AlbumListFragment", "onDestroy");
         super.onDestroy();
         adapter = null;
         // model = null; must this be done?

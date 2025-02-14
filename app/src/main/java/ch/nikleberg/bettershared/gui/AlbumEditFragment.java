@@ -4,7 +4,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -34,7 +33,6 @@ public class AlbumEditFragment extends Fragment implements MenuProvider {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d("AlbumEditFragment", "onCreate");
         super.onCreate(savedInstanceState);
 
         Transition animation = TransitionInflater.from(requireContext()).inflateTransition(android.R.transition.move);
@@ -50,7 +48,6 @@ public class AlbumEditFragment extends Fragment implements MenuProvider {
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        Log.d("AlbumEditFragment", "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         binding = FragmentAlbumEditBinding.bind(view);
 
@@ -71,7 +68,6 @@ public class AlbumEditFragment extends Fragment implements MenuProvider {
 
     @Override
     public void onDestroyView() {
-        Log.d("AlbumEditFragment", "onDestroyView");
         super.onDestroyView();
         binding = null;
     }

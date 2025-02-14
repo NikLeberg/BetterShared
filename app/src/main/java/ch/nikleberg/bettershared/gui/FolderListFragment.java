@@ -1,7 +1,6 @@
 package ch.nikleberg.bettershared.gui;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -31,13 +30,8 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
         super(R.layout.fragment_folder_list);
     }
 
-    //*************************
-    //** Lifecycle Callbacks **
-    //*************************
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.d("FolderListFragment", "onCreate");
         super.onCreate(savedInstanceState);
 
         adapter = new FolderRecyclerViewAdapter();
@@ -55,7 +49,6 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
-        Log.d("FolderListFragment", "onViewCreated");
         super.onViewCreated(view, savedInstanceState);
         binding = FragmentFolderListBinding.bind(view);
 
@@ -78,14 +71,12 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
 
     @Override
     public void onDestroyView() {
-        Log.d("FolderListFragment", "onDestroyView");
         super.onDestroyView();
         binding = null;
     }
 
     @Override
     public void onDestroy() {
-        Log.d("FolderListFragment", "onDestroy");
         super.onDestroy();
         adapter = null;
         // model = null; must this be done?
