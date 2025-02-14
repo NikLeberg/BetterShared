@@ -70,9 +70,9 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
             model.reload();
         });
 
-        model.getFolders().observe(getViewLifecycleOwner(), albums -> {
+        model.getFolders().observe(getViewLifecycleOwner(), folders -> {
             binding.progress.setVisibility(View.GONE);
-            adapter.setData(albums);
+            adapter.submitList(folders);
         });
     }
 
@@ -94,7 +94,7 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
     @Override
     public void onFolderClick(int position, FragmentFolderItemBinding binding) {
         Bundle args = new Bundle();
-        args.putString("folder_id", adapter.getFolder(position).id);
+        args.putString("folder_id", adapter.get(position).id);
         Navigation.findNavController(this.binding.getRoot()).navigate(R.id.action_folderListFragment_self,
                 args, null);
     }

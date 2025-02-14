@@ -18,8 +18,8 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
 import ch.nikleberg.bettershared.R;
-import ch.nikleberg.bettershared.databinding.FragmentAlbumEditBinding;
 import ch.nikleberg.bettershared.data.AlbumRepository;
+import ch.nikleberg.bettershared.databinding.FragmentAlbumEditBinding;
 import ch.nikleberg.bettershared.model.AlbumEditModel;
 
 public class AlbumEditFragment extends Fragment implements MenuProvider {

@@ -16,10 +16,10 @@ import androidx.navigation.fragment.FragmentNavigator;
 import androidx.navigation.ui.NavigationUI;
 
 import ch.nikleberg.bettershared.R;
-import ch.nikleberg.bettershared.databinding.FragmentAlbumItemBinding;
-import ch.nikleberg.bettershared.databinding.FragmentAlbumListBinding;
 import ch.nikleberg.bettershared.data.Album;
 import ch.nikleberg.bettershared.data.AlbumRepository;
+import ch.nikleberg.bettershared.databinding.FragmentAlbumItemBinding;
+import ch.nikleberg.bettershared.databinding.FragmentAlbumListBinding;
 import ch.nikleberg.bettershared.model.AlbumListModel;
 
 public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdapter.AlbumClickListener {
@@ -88,7 +88,7 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         binding.albumRecycler.setAdapter(adapter);
         binding.fab.setOnClickListener(this::onFabClick);
 
-        model.getAlbums().observe(getViewLifecycleOwner(), albums -> adapter.setData(albums));
+        model.getAlbums().observe(getViewLifecycleOwner(), albums -> adapter.submitList(albums));
     }
 
     @Override
@@ -136,7 +136,7 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
                 .addSharedElement(binding.albumThumb, "album_thumb")
                 .build();
         Bundle args = new Bundle();
-        args.putLong("album_id", adapter.getAlbum(position).id);
+        args.putLong("album_id", adapter.get(position).id);
         Navigation.findNavController(binding.getRoot()).navigate(R.id.action_albumListFragment_to_albumEditFragment,
                 args, null, extras);
     }
