@@ -5,6 +5,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MenuProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.microsoft.graph.models.Folder;
@@ -13,22 +14,16 @@ import com.microsoft.identity.client.IAccount;
 import com.microsoft.identity.client.exception.MsalClientException;
 import com.microsoft.identity.client.exception.MsalException;
 
-import java.util.ArrayList;
-
 import ch.nikleberg.bettershared.R;
-import ch.nikleberg.bettershared.db.Album;
-import ch.nikleberg.bettershared.db.AlbumObserver;
 import ch.nikleberg.bettershared.ms.DriveUtils;
 import ch.nikleberg.bettershared.ms.auth.Auth;
 import ch.nikleberg.bettershared.ms.auth.AuthProvider;
 
-public class MainActivity extends AppCompatActivity implements AlbumObserver {
+public class MainActivity extends AppCompatActivity implements MenuProvider {
     public final String TAG = MainActivity.class.getSimpleName();
 
     private final Auth auth = Auth.getInstance();
     private GraphServiceClient graph = null;
-
-    private ArrayList<Album> albums = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +42,8 @@ public class MainActivity extends AppCompatActivity implements AlbumObserver {
         auth.authenticateSilent().thenAccept(v -> {
             showLoggedInAsSnackbar();
             // DEBUG START
-            test();
+//            graph = new GraphServiceClient(new AuthProvider(auth));
+//            test2();
             // DEBUG END
         }).exceptionally(ex -> {
             showLogInRequestSnackbar();
@@ -81,14 +77,15 @@ public class MainActivity extends AppCompatActivity implements AlbumObserver {
     }
 
     private void showAuthenticationFailureDialog(Throwable ex) {
-        String message = null;
+        String message;
         if (ex instanceof MsalClientException) {
             MsalException msalEx = (MsalException) ex;
             message = getString(R.string.auth_error_message, msalEx.getMessage(), msalEx.getErrorCode());
         } else {
             message = getString(R.string.auth_error_message, ex.getMessage(), "unknown");
         }
-        new AlertDialog.Builder(this)
+        // TODO: Dialog is not showing.
+        new AlertDialog.Builder(getApplicationContext())
                 .setMessage(message)
                 .setPositiveButton(R.string.auth_error_button_retry,
                         (dialog, which) -> authenticateInteractive())
@@ -99,40 +96,20 @@ public class MainActivity extends AppCompatActivity implements AlbumObserver {
                 .show();
     }
 
-    // *********************************************************************************************
-    // ** Album Recycler
-    // *********************************************************************************************
-
-    @Override
-    public void onAlbumAdded(Album album) {
-        albums.add(album);
-    }
-
-    @Override
-    public void onAlbumChanged(Album album) {
-        albums.replaceAll(a -> a.id == album.id ? album : a);
-    }
-
-    @Override
-    public void onAlbumRemoved(Album album) {
-        albums.removeIf(a -> a.id == album.id);
-    }
-
     private void test() {
         graph = new GraphServiceClient(new AuthProvider(auth));
-        DriveUtils.getDrives(graph).thenAccept(drives -> {
-            drives.forEach(drive -> {
-                Log.d(TAG, "Drive type: " + drive.getDriveType() + ", id: " + drive.getId());
-                // personal drive-id: 31867e5cd2a336b
+        DriveUtils.getDrives(graph).thenAccept(drives -> drives.forEach(drive -> {
+            Log.d(TAG, "Drive type: " + drive.getDriveType() + ", id: " + drive.getId());
+            // personal drive-id: 31867e5cd2a336b
+            //     drive-item-id: 31867e5cd2a336b!68561
 
-                DriveUtils.getDriveItem(graph, drive.getId(), "root").thenAccept(item -> {
-                    Folder folder = item.getFolder();
-                    if (null != folder) {
-                        Log.d(TAG, "Root folder has " + item.getFolder().getChildCount() + " items.");
-                    }
-                });
+            DriveUtils.getDriveItem(graph, drive.getId(), "root").thenAccept(item -> {
+                Folder folder = item.getFolder();
+                if (null != folder) {
+                    Log.d(TAG, "Root folder has " + item.getFolder().getChildCount() + " items.");
+                }
             });
-        });
+        }));
     }
 
     private void test2() {

@@ -2,13 +2,14 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/album_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:layout_marginEnd="8dp"
+    android:layout_marginStart="@dimen/normal_margin"
+    android:layout_marginTop="@dimen/normal_margin"
+    android:layout_marginEnd="@dimen/normal_margin"
     android:clickable="true"
-    app:cardCornerRadius="16dp"
+    app:cardCornerRadius="@dimen/card_corner_radius"
     tools:ignore="HardcodedText">
 
     <RelativeLayout
@@ -25,14 +26,13 @@
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
+                android:layout_weight="@integer/album_item_thumb_layout_weight">
 
                 <!-- transitionName must be programmatically set to a unique name if used in a recycler -->
                 <ImageView
                     android:id="@+id/album_thumb"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:adjustViewBounds="true"
                     android:contentDescription="thumbnail of the album"
                     android:scaleType="centerCrop"
                     android:transitionName="album_thumb"
@@ -40,14 +40,14 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/img" />
+                    app:srcCompat="@drawable/ic_folder" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="3"
+                android:layout_weight="@integer/album_item_info_layout_weight"
                 android:orientation="vertical"
                 android:padding="8dp">
 
@@ -79,7 +79,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@id/info_container"
             android:layout_alignParentEnd="true"
-            android:layout_margin="8dp"
+            android:layout_margin="@dimen/normal_margin"
             android:text="(album_count)"
             android:textColor="?android:attr/textColorSecondary"
             android:textSize="14sp" />

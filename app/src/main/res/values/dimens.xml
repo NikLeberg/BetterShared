@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="normal_margin">8dp</dimen>
+    <dimen name="double_margin">16dp</dimen>
+    <dimen name="card_corner_radius">16dp</dimen>
+</resources>
