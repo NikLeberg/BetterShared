@@ -44,8 +44,7 @@ class FolderRecyclerViewAdapter extends ListAdapter<Folder, FolderRecyclerViewAd
 
         public void bindTo(Folder folder) {
             binding.folderName.setText(folder.name);
-//            binding.folderCount.setText(folder.count);
-            binding.folderCount.setText("0");
+            binding.folderCount.setText(folder.count >= 0 ? String.valueOf(folder.count) : "?");
         }
 
         private void onFolderClick(View view) {

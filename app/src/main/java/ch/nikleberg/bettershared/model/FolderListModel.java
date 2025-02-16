@@ -1,7 +1,5 @@
 package ch.nikleberg.bettershared.model;
 
-import android.util.Log;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
@@ -24,8 +22,6 @@ public class FolderListModel extends ViewModel {
         this.repo = repo;
         this.folderId = folderId;
         folders = repo.getFolders(folderId);
-
-        addCloseable(() -> Log.d("FolderListModel", "closing folder: " + this.folderId));
     }
 
     public LiveData<List<Folder>> getFolders() {
