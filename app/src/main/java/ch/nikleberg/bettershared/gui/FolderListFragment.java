@@ -63,6 +63,8 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
             model.reload();
         });
 
+        new EmptyRecyclerViewObserver(binding.folderRecycler, binding.emptyView, false);
+
         model.getFolders().observe(getViewLifecycleOwner(), folders -> {
             binding.progress.setVisibility(View.GONE);
             adapter.submitList(folders);

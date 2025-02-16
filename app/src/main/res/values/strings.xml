@@ -16,4 +16,6 @@
     <string name="fragment_album_list_label">Albums</string>
     <string name="fragment_album_edit_label">Edit Album</string>
     <string name="fragment_folder_list_label">Choose Folder for Album</string>
+    <string name="fragment_album_list_empty_message">No albums configured.</string>
+    <string name="fragment_folder_list_empty_message">No more subfolders.</string>
 </resources>

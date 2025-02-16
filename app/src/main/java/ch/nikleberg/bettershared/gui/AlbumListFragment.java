@@ -83,6 +83,8 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         binding.albumRecycler.setAdapter(adapter);
         binding.fab.setOnClickListener(this::onFabClick);
 
+        new EmptyRecyclerViewObserver(binding.albumRecycler, binding.emptyView, true);
+
         model.getAlbums().observe(getViewLifecycleOwner(), albums -> adapter.submitList(albums));
     }
 
