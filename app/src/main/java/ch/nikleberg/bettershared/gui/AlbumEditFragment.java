@@ -4,13 +4,9 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -21,10 +17,9 @@ import ch.nikleberg.bettershared.data.AlbumRepository;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumEditBinding;
 import ch.nikleberg.bettershared.model.AlbumEditModel;
 
-public class AlbumEditFragment extends Fragment implements MenuProvider {
+public class AlbumEditFragment extends Fragment {
 
     private AlbumEditModel model;
-
     private FragmentAlbumEditBinding binding;
 
     public AlbumEditFragment() {
@@ -70,15 +65,5 @@ public class AlbumEditFragment extends Fragment implements MenuProvider {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
-    }
-
-    @Override
-    public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
-        menuInflater.inflate(R.menu.menu_main, menu);
-    }
-
-    @Override
-    public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
-        return false;
     }
 }
