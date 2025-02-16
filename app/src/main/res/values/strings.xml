@@ -13,4 +13,7 @@
     <string name="auth_error_message">Authentication failed with error \'%1$s\' (%2$s). Please check your internet connection.</string>
     <string name="auth_error_button_retry">Retry</string>
     <string name="auth_error_button_cancel">Cancel</string>
+    <string name="fragment_album_list_label">Albums</string>
+    <string name="fragment_album_edit_label">Edit Album</string>
+    <string name="fragment_folder_list_label">Choose Folder for Album</string>
 </resources>

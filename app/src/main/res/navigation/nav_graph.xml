@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/albumListFragment"
         android:name="ch.nikleberg.bettershared.gui.AlbumListFragment"
-        android:label="AlbumListFragment"
+        android:label="@string/fragment_album_list_label"
         tools:layout="@layout/fragment_album_list">
         <action
             android:id="@+id/action_albumListFragment_to_albumEditFragment"
@@ -21,7 +21,7 @@
     <fragment
         android:id="@+id/albumEditFragment"
         android:name="ch.nikleberg.bettershared.gui.AlbumEditFragment"
-        android:label="AlbumEditFragment"
+        android:label="@string/fragment_album_edit_label"
         tools:layout="@layout/fragment_album_edit">
         <argument
             android:name="album_id"
@@ -31,7 +31,7 @@
     <fragment
         android:id="@+id/folderListFragment"
         android:name="ch.nikleberg.bettershared.gui.FolderListFragment"
-        android:label="FolderListFragment"
+        android:label="@string/fragment_folder_list_label"
         tools:layout="@layout/fragment_folder_list">
         <action
             android:id="@+id/action_folderListFragment_self"
