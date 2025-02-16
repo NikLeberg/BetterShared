@@ -22,4 +22,14 @@ public class Folder {
                 count == folder.count
         );
     }
+
+    public String[] splitId() {
+        return splitId(id);
+    }
+
+    public static String[] splitId(String id) {
+        String[] ids = id.split("!");
+        String itemId = "root".equals(ids[1]) ? "root" : id;
+        return new String[]{ids[0], itemId};
+    }
 }
