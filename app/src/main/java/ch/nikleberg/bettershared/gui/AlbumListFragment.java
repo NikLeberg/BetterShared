@@ -16,12 +16,17 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.microsoft.graph.serviceclient.GraphServiceClient;
+
 import ch.nikleberg.bettershared.R;
 import ch.nikleberg.bettershared.data.Album;
 import ch.nikleberg.bettershared.data.AlbumRepository;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumItemBinding;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumListBinding;
 import ch.nikleberg.bettershared.model.AlbumListModel;
+import ch.nikleberg.bettershared.ms.GraphUtils;
+import ch.nikleberg.bettershared.ms.auth.Auth;
+import ch.nikleberg.bettershared.ms.auth.AuthProvider;
 
 public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdapter.AlbumClickListener {
 
@@ -43,31 +48,15 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         adapter = new AlbumRecyclerViewAdapter();
         adapter.setClickListener(this);
 
-        AlbumRepository repo = new AlbumRepository(requireContext());
+        GraphServiceClient graph = GraphUtils.Factory.getDebugServiceClient(new AuthProvider(Auth.getInstance()));
+
+        AlbumRepository repo = new AlbumRepository(requireContext(), graph);
         model = AlbumListModel.Factory.build(getViewModelStore(), repo);
-        addAlbumNow();
-        addAlbumNow();
-        addAlbumNow();
-//        addAlbum();
-    }
 
-    private static int i = 0;
-
-    private void addAlbum() {
-        AlbumRepository.executor.execute(() -> {
-            try {
-                Thread.sleep(5000);
-                addAlbumNow();
-                AlbumRepository.executor.submit(this::addAlbum);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        });
-    }
-
-    private void addAlbumNow() {
-        i = i + 1;
-        model.add(new Album(i, "Album " + i, "path/to/drive/item/" + i, null, i, "drive-id", "item-id"));
+        Bundle args = getArguments();
+        String folderId = null;
+        if (null != args) folderId = args.getString("new_album_folder_id");
+        if (null != folderId) model.add(folderId);
     }
 
     @Override

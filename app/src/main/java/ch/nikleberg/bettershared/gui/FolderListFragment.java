@@ -22,6 +22,7 @@ import ch.nikleberg.bettershared.ms.auth.AuthProvider;
 public class FolderListFragment extends Fragment implements FolderRecyclerViewAdapter.FolderClickListener {
 
     private FolderListModel model;
+    private String folderId = null;
 
     private FolderRecyclerViewAdapter adapter;
     private FragmentFolderListBinding binding;
@@ -38,7 +39,6 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
         adapter.setClickListener(this);
 
         Bundle args = getArguments();
-        String folderId = null;
         if (null != args) folderId = args.getString("folder_id");
         if (null == folderId) folderId = "";
 
@@ -62,6 +62,11 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
             binding.progress.setVisibility(View.VISIBLE);
             model.reload();
         });
+
+        if (null == folderId || folderId.isEmpty())
+            binding.fab.setVisibility(View.GONE);
+        else
+            binding.fab.setOnClickListener(this::onFabClick);
 
         new EmptyRecyclerViewObserver(binding.folderRecycler, binding.emptyView, false);
 
@@ -89,6 +94,13 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
         Bundle args = new Bundle();
         args.putString("folder_id", adapter.get(position).id);
         Navigation.findNavController(this.binding.getRoot()).navigate(R.id.action_folderListFragment_self,
+                args, null);
+    }
+
+    private void onFabClick(View view) {
+        Bundle args = new Bundle();
+        args.putString("new_album_folder_id", folderId);
+        Navigation.findNavController(this.binding.getRoot()).navigate(R.id.action_folderListFragment_to_albumListFragment,
                 args, null);
     }
 }

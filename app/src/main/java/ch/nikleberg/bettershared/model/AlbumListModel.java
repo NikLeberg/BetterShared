@@ -26,12 +26,8 @@ public class AlbumListModel extends ViewModel {
         return albums;
     }
 
-    public void add(Album album) {
-        repo.add(album);
-    }
-
-    public void change(Album album) {
-        repo.change(album);
+    public void add(String folderId) {
+        repo.add(folderId);
     }
 
     public void remove(Album album) {

@@ -37,7 +37,7 @@ public class AlbumEditFragment extends Fragment {
         Bundle args = getArguments();
         long albumId = 0;
         if (null != args) albumId = args.getLong("album_id");
-        AlbumRepository repo = new AlbumRepository(requireContext());
+        AlbumRepository repo = new AlbumRepository(requireContext(), null);
         model = AlbumEditModel.Factory.build(getViewModelStore(), repo, albumId);
     }
 
