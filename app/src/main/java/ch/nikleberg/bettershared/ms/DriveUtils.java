@@ -1,5 +1,7 @@
 package ch.nikleberg.bettershared.ms;
 
+import androidx.annotation.Nullable;
+
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.models.DriveCollectionResponse;
 import com.microsoft.graph.models.DriveItem;
@@ -12,31 +14,45 @@ import java.util.concurrent.CompletableFuture;
 
 public class DriveUtils {
     public static final List<String> DRIVE_SCOPES = List.of("Files.Read.All");
+    public static final List<String> SELECT_DRIVES = List.of("id", "driveType");
+    public static final List<String> SELECT_DRIVE_ITEMS_FOLDERS = List.of("id", "name", "folder");
+    public static final List<String> SELECT_DRIVE_ITEMS_FILES = List.of("id", "name", "file");
+    public static final List<String> SELECT_DRIVE_ITEM_FOLDER = List.of("id", "name", "folder", "parentReference");
 
     private DriveUtils() {
     }
 
-    public static CompletableFuture<List<Drive>> getDrives(GraphServiceClient graph) {
+    public static CompletableFuture<List<Drive>> getDrives(GraphServiceClient graph, @Nullable List<String> select) {
         return GraphUtils.getPagedAsync(graph, () -> graph.drives().get(request -> {
-            assert request.queryParameters != null;
-            //request.queryParameters.select = new String[]{"id", "name", "driveType"};
-            request.queryParameters.top = 4;
+            if (null != select) {
+                assert request.queryParameters != null;
+                request.queryParameters.select = select.toArray(new String[0]);
+            }
         }), new ArrayList<>(), DriveCollectionResponse::createFromDiscriminatorValue);
     }
 
-    public static CompletableFuture<DriveItem> getDriveItem(GraphServiceClient graph, String driveId, String itemId) {
+    public static CompletableFuture<List<Drive>> getDrives(GraphServiceClient graph) {
+        return getDrives(graph, null);
+    }
+
+    public static CompletableFuture<DriveItem> getDriveItem(GraphServiceClient graph, String driveId, String itemId, @Nullable List<String> select) {
         return GraphUtils.getAsync(() -> graph.drives().byDriveId(driveId).items().byDriveItemId(itemId).get());
     }
 
-    public static CompletableFuture<List<DriveItem>> getDriveItems(GraphServiceClient graph, String driveId, String itemId) {
+    public static CompletableFuture<DriveItem> getDriveItem(GraphServiceClient graph, String driveId, String itemId) {
+        return getDriveItem(graph, driveId, itemId, null);
+    }
+
+    public static CompletableFuture<List<DriveItem>> getDriveItems(GraphServiceClient graph, String driveId, String itemId, @Nullable List<String> select) {
         return GraphUtils.getPagedAsync(graph, () -> graph.drives().byDriveId(driveId).items().byDriveItemId(itemId).children().get(request -> {
-            assert request.queryParameters != null;
-            //request.queryParameters.select = new String[]{"id", "name", "file", "folder"};
-            request.queryParameters.top = 4;
+            if (null != select) {
+                assert request.queryParameters != null;
+                request.queryParameters.select = select.toArray(new String[0]);
+            }
         }), new ArrayList<>(), DriveItemCollectionResponse::createFromDiscriminatorValue);
     }
 
-    public static CompletableFuture<List<DriveItem>> getDriveItems(GraphServiceClient graph, String driveId) {
-        return getDriveItems(graph, driveId, "root");
+    public static CompletableFuture<List<DriveItem>> getDriveItems(GraphServiceClient graph, String driveId, String itemId) {
+        return getDriveItems(graph, driveId, itemId, null);
     }
 }
