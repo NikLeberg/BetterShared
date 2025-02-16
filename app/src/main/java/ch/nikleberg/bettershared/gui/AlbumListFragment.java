@@ -1,5 +1,8 @@
 package ch.nikleberg.bettershared.gui;
 
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -19,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.microsoft.graph.serviceclient.GraphServiceClient;
 
 import ch.nikleberg.bettershared.R;
-import ch.nikleberg.bettershared.data.Album;
 import ch.nikleberg.bettershared.data.AlbumRepository;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumItemBinding;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumListBinding;
@@ -75,6 +77,8 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         new EmptyRecyclerViewObserver(binding.albumRecycler, binding.emptyView, true);
 
         model.getAlbums().observe(getViewLifecycleOwner(), albums -> adapter.submitList(albums));
+
+        installItemSwipeHandler();
     }
 
     @Override
@@ -111,6 +115,35 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
                         return true;
                     }
                 });
+    }
+
+    private void installItemSwipeHandler() {
+        ColorDrawable background = new ColorDrawable(Color.RED);
+        ItemTouchHelper helper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView,
+                                    @NonNull RecyclerView.ViewHolder viewHolder,
+                                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (dX != 0f) {
+                    View item = viewHolder.itemView;
+                    background.setAlpha(255 * (int) Math.abs(dX) / item.getWidth());
+                    background.setBounds(item.getLeft(), item.getTop(), item.getRight(), item.getBottom());
+                    background.draw(c);
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false; // should never be called
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                model.remove(adapter.get(viewHolder.getAdapterPosition()));
+            }
+        });
+        helper.attachToRecyclerView(binding.albumRecycler);
     }
 
     @Override
