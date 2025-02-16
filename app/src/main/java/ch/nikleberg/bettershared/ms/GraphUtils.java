@@ -4,8 +4,10 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import com.microsoft.graph.core.requests.GraphClientFactory;
 import com.microsoft.graph.core.tasks.PageIterator;
 import com.microsoft.graph.serviceclient.GraphServiceClient;
+import com.microsoft.kiota.authentication.AuthenticationProvider;
 import com.microsoft.kiota.serialization.AdditionalDataHolder;
 import com.microsoft.kiota.serialization.Parsable;
 import com.microsoft.kiota.serialization.ParsableFactory;
@@ -13,6 +15,8 @@ import com.microsoft.kiota.serialization.ParsableFactory;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
+
+import okhttp3.OkHttpClient;
 
 public class GraphUtils {
     private static final String TAG = GraphUtils.class.getSimpleName();
@@ -68,5 +72,14 @@ public class GraphUtils {
             @NonNull ParsableFactory<TCollectionPage> collectionPageFactory
     ) {
         return getPagedAsync(gc, CompletableFuture.supplyAsync(pageSupplier), list, collectionPageFactory);
+    }
+
+    public static class Factory {
+        public static GraphServiceClient getDebugServiceClient(AuthenticationProvider authProvider) {
+            final OkHttpClient okHttpClient = GraphClientFactory.create(GraphServiceClient.getGraphClientOptions())
+                    .addInterceptor(new GraphAPIInterceptor())
+                    .build();
+            return new GraphServiceClient(authProvider, okHttpClient);
+        }
     }
 }
