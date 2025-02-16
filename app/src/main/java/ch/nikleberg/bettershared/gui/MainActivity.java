@@ -7,7 +7,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.microsoft.graph.models.Folder;
 import com.microsoft.graph.serviceclient.GraphServiceClient;
 import com.microsoft.identity.client.IAccount;
 import com.microsoft.identity.client.exception.MsalClientException;
@@ -102,19 +101,19 @@ public class MainActivity extends AppCompatActivity {
             // personal drive-id: 31867e5cd2a336b
             //     drive-item-id: 31867e5cd2a336b!68561
 
-            DriveUtils.getDriveItem(graph, drive.getId(), "root").thenAccept(item -> {
-                Folder folder = item.getFolder();
-                if (null != folder) {
-                    Log.d(TAG, "Root folder has " + item.getFolder().getChildCount() + " items.");
-                }
-            });
+//            DriveUtils.getDriveItem(graph, drive.getId(), "root").thenAccept(item -> {
+//                Folder folder = item.getFolder();
+//                if (null != folder) {
+//                    Log.d(TAG, "Root folder has " + item.getFolder().getChildCount() + " items.");
+//                }
+//            });
         }));
     }
 
     private void test2() {
         DriveUtils.getDrives(graph).thenAccept(drives -> drives.forEach(drive -> {
             Log.i(TAG, "Drive: " + drive.getDriveType() + ", ID: " + drive.getId());
-            DriveUtils.getDriveItems(graph, drive.getId()).thenAccept(items -> items.forEach(item -> {
+            DriveUtils.getDriveItems(graph, drive.getId(), "root").thenAccept(items -> items.forEach(item -> {
                 boolean isFolder = null != item.getFolder();
                 Log.i(TAG, "Item: " + item.getName() + ", ID: " + item.getId() + ", Type: " + (isFolder ? "Folder" : "File"));
                 if (isFolder) {

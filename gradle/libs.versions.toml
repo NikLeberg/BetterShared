@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.0"
+agp = "8.8.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
@@ -13,7 +13,7 @@ microsoftIdentity = "5.9.0"
 roomRuntime = "2.6.1"
 roomCompiler = "2.6.1"
 roomPlugin = "2.6.1"
-navigationFragment = "2.8.6"
+navigation = "2.8.7"
 
 [libraries]
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -34,3 +34,4 @@ navigation-fragment = { group = "androidx.navigation", name = "navigation-fragme
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 room-plugin = { id = "androidx.room", version.ref = "roomPlugin" }
+navigation-safeargs = { id = "androidx.navigation.safeargs", version.ref = "navigation" }

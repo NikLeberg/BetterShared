@@ -16,6 +16,7 @@ import ch.nikleberg.bettershared.data.FolderRepository;
 import ch.nikleberg.bettershared.databinding.FragmentFolderItemBinding;
 import ch.nikleberg.bettershared.databinding.FragmentFolderListBinding;
 import ch.nikleberg.bettershared.model.FolderListModel;
+import ch.nikleberg.bettershared.ms.GraphUtils;
 import ch.nikleberg.bettershared.ms.auth.Auth;
 import ch.nikleberg.bettershared.ms.auth.AuthProvider;
 
@@ -42,7 +43,7 @@ public class FolderListFragment extends Fragment implements FolderRecyclerViewAd
         if (null != args) folderId = args.getString("folder_id");
         if (null == folderId) folderId = "";
 
-        GraphServiceClient graph = new GraphServiceClient(new AuthProvider(Auth.getInstance()));
+        GraphServiceClient graph = GraphUtils.Factory.getDebugServiceClient(new AuthProvider(Auth.getInstance()));
         FolderRepository repo = new FolderRepository(graph);
         model = FolderListModel.Factory.build(getViewModelStore(), repo, folderId);
     }
