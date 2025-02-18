@@ -8,6 +8,7 @@ material = "1.12.0"
 activity = "1.9.3"
 constraintlayout = "2.2.0"
 swiperefreshlayout = "1.1.0"
+preference = "1.2.1"
 microsoftGraph = "6.27.0"
 microsoftIdentity = "5.9.0"
 roomRuntime = "2.6.1"
@@ -24,6 +25,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 swiperefreshlayout = { group = "androidx.swiperefreshlayout", name = "swiperefreshlayout", version.ref = "swiperefreshlayout" }
+preference = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 microsoft-graph = { group = "com.microsoft.graph", name = "microsoft-graph", version.ref = "microsoftGraph" }
 microsoft-identity = { group = "com.microsoft.identity.client", name = "msal", version.ref = "microsoftIdentity" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomRuntime" }
