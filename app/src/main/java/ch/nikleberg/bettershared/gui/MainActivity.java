@@ -1,5 +1,7 @@
 package ch.nikleberg.bettershared.gui;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -22,6 +24,10 @@ public class MainActivity extends AppCompatActivity {
 
     private final Auth auth = Auth.getInstance();
     private GraphServiceClient graph = null;
+
+    public static Intent getLaunchIntent(Context context) {
+        return new Intent(context, MainActivity.class);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
