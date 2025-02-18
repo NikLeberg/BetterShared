@@ -12,6 +12,7 @@ import java.util.Arrays;
 @Entity(tableName = "album")
 public class Album {
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     public long id;
 
     @ColumnInfo(name = "name")
@@ -24,7 +25,7 @@ public class Album {
     public byte[] thumb;
 
     @ColumnInfo(name = "count")
-    public int count;
+    public long count;
 
     @ColumnInfo(name = "drive_id")
     public String driveId;
@@ -37,7 +38,7 @@ public class Album {
         this(0, "", "", null, 0, "", "");
     }
 
-    public Album(long id, String name, String path, byte[] thumb, int count, String driveId, String itemId) {
+    public Album(long id, String name, String path, byte[] thumb, long count, String driveId, String itemId) {
         this.id = id;
         this.name = name;
         this.path = path;

@@ -8,9 +8,9 @@ public class Folder {
     public String id;
 
     public String name;
-    public int count;
+    public long count;
 
-    public Folder(String id, String name, int count) {
+    public Folder(String id, String name, long count) {
         this.id = id;
         this.name = name;
         this.count = count;
