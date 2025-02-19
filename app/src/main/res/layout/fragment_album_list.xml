@@ -18,6 +18,8 @@
         android:id="@+id/album_recycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="@dimen/fab_offset_height"
         app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
