@@ -2,6 +2,8 @@ package ch.nikleberg.bettershared.data;
 
 import androidx.annotation.NonNull;
 
+import java.util.Objects;
+
 public class Folder {
     // "drive-id" + "!" + "drive-item-id"
     // "AAAAAAAAAAAAAAA!XXXXX"
@@ -17,8 +19,8 @@ public class Folder {
     }
 
     public boolean equals(@NonNull Folder folder) {
-        return (id.equals(folder.id) &&
-                name.equals(folder.name) &&
+        return (Objects.equals(id, folder.id) &&
+                Objects.equals(name, folder.name) &&
                 count == folder.count
         );
     }

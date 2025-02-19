@@ -8,6 +8,7 @@ import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 @Entity(tableName = "album")
 public class Album {
@@ -51,12 +52,12 @@ public class Album {
     @Ignore
     public boolean equals(@NonNull Album album) {
         return (id == album.id &&
-                name.equals(album.name) &&
-                path.equals(album.path) &&
+                Objects.equals(name, album.name) &&
+                Objects.equals(path, album.path) &&
                 Arrays.equals(thumb, album.thumb) &&
                 count == album.count &&
-                driveId.equals(album.driveId) &&
-                itemId.equals(album.itemId)
+                Objects.equals(driveId, album.driveId) &&
+                Objects.equals(itemId, album.itemId)
         );
     }
 }
