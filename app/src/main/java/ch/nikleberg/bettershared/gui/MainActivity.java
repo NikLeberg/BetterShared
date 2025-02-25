@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
-import com.microsoft.graph.serviceclient.GraphServiceClient;
 import com.microsoft.identity.client.IAccount;
 import com.microsoft.identity.client.exception.MsalClientException;
 import com.microsoft.identity.client.exception.MsalException;
@@ -17,13 +16,11 @@ import com.microsoft.identity.client.exception.MsalException;
 import ch.nikleberg.bettershared.R;
 import ch.nikleberg.bettershared.ms.DriveUtils;
 import ch.nikleberg.bettershared.ms.auth.Auth;
-import ch.nikleberg.bettershared.ms.auth.AuthProvider;
 
 public class MainActivity extends AppCompatActivity {
     public final String TAG = MainActivity.class.getSimpleName();
 
-    private final Auth auth = Auth.getInstance();
-    private GraphServiceClient graph = null;
+    private Auth auth = null;
 
     public static Intent getLaunchIntent(Context context) {
         return new Intent(context, MainActivity.class);
@@ -34,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        auth = Auth.getInstance(getApplicationContext(), DriveUtils.DRIVE_SCOPES);
         authenticateSilent();
     }
 
@@ -42,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
     // *********************************************************************************************
 
     private void authenticateSilent() {
-        auth.setSilentContext(getApplicationContext(), DriveUtils.DRIVE_SCOPES);
         auth.authenticateSilent().thenAccept(v -> {
             showLoggedInAsSnackbar();
             // DEBUG START
@@ -56,9 +53,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void authenticateInteractive() {
-        auth.setInteractiveContext(getApplicationContext(), DriveUtils.DRIVE_SCOPES, this);
-        auth.authenticateInteractive().thenAccept(v -> {
-            auth.setInteractiveContext(null, null, null);
+        auth.authenticateInteractive(this).thenAccept(v -> {
             authenticateSilent();
         }).exceptionally(ex -> {
             showAuthenticationFailureDialog(ex);
@@ -98,43 +93,5 @@ public class MainActivity extends AppCompatActivity {
                 .setCancelable(false)
                 .create()
                 .show();
-    }
-
-    private void test() {
-        graph = new GraphServiceClient(new AuthProvider(auth));
-        DriveUtils.getDrives(graph).thenAccept(drives -> drives.forEach(drive -> {
-            Log.d(TAG, "Drive type: " + drive.getDriveType() + ", id: " + drive.getId());
-            // personal drive-id: 31867e5cd2a336b
-            //     drive-item-id: 31867e5cd2a336b!68561
-
-//            DriveUtils.getDriveItem(graph, drive.getId(), "root").thenAccept(item -> {
-//                Folder folder = item.getFolder();
-//                if (null != folder) {
-//                    Log.d(TAG, "Root folder has " + item.getFolder().getChildCount() + " items.");
-//                }
-//            });
-        }));
-    }
-
-    private void test2() {
-        DriveUtils.getDrives(graph).thenAccept(drives -> drives.forEach(drive -> {
-            Log.i(TAG, "Drive: " + drive.getDriveType() + ", ID: " + drive.getId());
-            DriveUtils.getDriveItems(graph, drive.getId(), "root").thenAccept(items -> items.forEach(item -> {
-                boolean isFolder = null != item.getFolder();
-                Log.i(TAG, "Item: " + item.getName() + ", ID: " + item.getId() + ", Type: " + (isFolder ? "Folder" : "File"));
-                if (isFolder) {
-                    DriveUtils.getDriveItems(graph, drive.getId(), item.getId()).thenAccept(subItems -> subItems.forEach(subItem -> {
-                        boolean isFolder2 = null != subItem.getFolder();
-                        Log.i(TAG, "\tFolder: " + item.getName() + ", Item: " + subItem.getName() + ", ID: " + subItem.getId() + ", Type: " + (isFolder2 ? "Folder" : "File"));
-                        if (isFolder2) {
-                            DriveUtils.getDriveItems(graph, drive.getId(), subItem.getId()).thenAccept(subItems2 -> subItems2.forEach(subItem2 -> {
-                                boolean isFolder3 = null != subItem2.getFolder();
-                                Log.i(TAG, "\t\tFolder: " + subItem.getName() + ", Item: " + subItem2.getName() + ", ID: " + subItem2.getId() + ", Type: " + (isFolder3 ? "Folder" : "File"));
-                            }));
-                        }
-                    }));
-                }
-            }));
-        }));
     }
 }

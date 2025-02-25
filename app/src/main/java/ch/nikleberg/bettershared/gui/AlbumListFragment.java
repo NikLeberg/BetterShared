@@ -26,7 +26,7 @@ import ch.nikleberg.bettershared.data.AlbumRepository;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumItemBinding;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumListBinding;
 import ch.nikleberg.bettershared.model.AlbumListModel;
-import ch.nikleberg.bettershared.ms.GraphUtils;
+import ch.nikleberg.bettershared.ms.DriveUtils;
 import ch.nikleberg.bettershared.ms.auth.Auth;
 import ch.nikleberg.bettershared.ms.auth.AuthProvider;
 
@@ -50,7 +50,8 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         adapter = new AlbumRecyclerViewAdapter();
         adapter.setClickListener(this);
 
-        GraphServiceClient graph = GraphUtils.Factory.getDebugServiceClient(new AuthProvider(Auth.getInstance()));
+        GraphServiceClient graph = new GraphServiceClient(new AuthProvider(
+                Auth.getInstance(requireContext().getApplicationContext(), DriveUtils.DRIVE_SCOPES)));
 
         AlbumRepository repo = new AlbumRepository(requireContext(), graph);
         model = AlbumListModel.Factory.build(getViewModelStore(), repo);

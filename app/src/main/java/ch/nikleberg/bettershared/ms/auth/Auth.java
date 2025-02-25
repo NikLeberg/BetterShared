@@ -20,58 +20,43 @@ import com.microsoft.identity.client.exception.MsalClientException;
 import com.microsoft.identity.client.exception.MsalException;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import ch.nikleberg.bettershared.R;
 
 public class Auth implements TokenProvider {
-    private static Auth INSTANCE = null;
+    private static final HashMap<Integer, Auth> INSTANCES = new HashMap<>();
 
-    private Context appContext = null;
-    private Activity parentActivity = null;
-    private List<String> scopes = null;
+    private final Context appContext;
+    private final List<String> scopes;
 
     private ISingleAccountPublicClientApplication app = null;
     private IAccount account = null;
     private IAuthenticationResult accessToken = null;
 
-    private Auth() {
+    private Auth(Context context, List<String> scopes) {
+        this.appContext = context;
+        this.scopes = scopes;
     }
 
-    public static synchronized Auth getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new Auth();
+    public static synchronized Auth getInstance(Context context, List<String> scopes) {
+        int key = scopes.hashCode();
+        if (INSTANCES.containsKey(key)) {
+            return INSTANCES.get(key);
+        } else {
+            Auth instance = new Auth(context, scopes);
+            INSTANCES.put(key, instance);
+            return instance;
         }
-        return INSTANCE;
     }
 
     public boolean isAuthenticated() {
         return (null != accessToken);
     }
 
-    public boolean canAuthenticateSilent() {
-        return (null != appContext && null != scopes);
-    }
-
-    public boolean canAuthenticateInteractive() {
-        return (null != parentActivity && canAuthenticateSilent());
-    }
-
-    public void setSilentContext(@Nullable Context appContext, @Nullable List<String> scopes) {
-        this.appContext = appContext;
-        this.scopes = scopes;
-    }
-
-    public void setInteractiveContext(@Nullable Context appContext, @Nullable List<String> scopes, @Nullable Activity parentActivity) {
-        this.appContext = appContext;
-        this.scopes = scopes;
-        this.parentActivity = parentActivity;
-    }
-
     public CompletableFuture<Void> authenticateSilent() {
-        assert canAuthenticateSilent();
-
         return CompletableFuture.supplyAsync(() -> {
             createApp();
             loadAccount();
@@ -100,9 +85,7 @@ public class Auth implements TokenProvider {
         });
     }
 
-    public CompletableFuture<Void> authenticateInteractive() {
-        assert canAuthenticateInteractive();
-
+    public CompletableFuture<Void> authenticateInteractive(Activity parentActivity) {
         return CompletableFuture.supplyAsync(() -> {
             createApp();
             return null;
