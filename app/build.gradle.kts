@@ -5,8 +5,8 @@ plugins {
 
 android {
     namespace = "ch.nikleberg.bettershared"
-    compileSdk = 34
-    compileSdkExtension = 10
+    compileSdk = 35
+    compileSdkExtension = 14
 
     defaultConfig {
         applicationId = "ch.nikleberg.bettershared"
@@ -48,7 +48,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -60,6 +59,7 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.navigation.fragment)
     implementation(libs.preference)
+    implementation(libs.work)
     annotationProcessor(libs.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
