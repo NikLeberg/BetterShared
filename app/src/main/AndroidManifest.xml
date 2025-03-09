@@ -43,7 +43,7 @@
 
         <provider
             android:name=".cp.Provider"
-            android:authorities="ch.nikleberg.bettershared"
+            android:authorities="ch.nikleberg.bettershared.cloudpicker"
             android:exported="true"
             android:permission="com.android.providers.media.permission.MANAGE_CLOUD_MEDIA_PROVIDERS">
             <intent-filter>
