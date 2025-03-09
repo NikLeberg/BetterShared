@@ -54,7 +54,7 @@ public class AlbumEditModel extends ViewModel {
                     AlbumRepository repo = creationExtras.get(REPOSITORY_KEY);
                     assert repo != null;
                     Long albumId = creationExtras.get(ALBUM_ID_KEY);
-                    if (null == albumId) albumId = (long)0;
+                    if (null == albumId) albumId = 0L;
                     return new AlbumEditModel(repo, albumId);
                 }
         );

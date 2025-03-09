@@ -1,6 +1,5 @@
 package ch.nikleberg.bettershared.gui;
 
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
@@ -35,7 +34,7 @@ public class AlbumEditFragment extends Fragment {
         setSharedElementReturnTransition(animation);
 
         Bundle args = getArguments();
-        long albumId = 0;
+        long albumId = 0L;
         if (null != args) albumId = args.getLong("album_id");
         AlbumRepository repo = new AlbumRepository(requireContext(), null);
         model = AlbumEditModel.Factory.build(getViewModelStore(), repo, albumId);
@@ -51,9 +50,9 @@ public class AlbumEditFragment extends Fragment {
 
         model.getAlbum().observe(getViewLifecycleOwner(), album -> {
             binding.albumName.setText(album.name);
-            if (null != album.thumb) binding.albumThumb.setImageBitmap(
-                    BitmapFactory.decodeByteArray(album.thumb, 0, album.thumb.length)
-            );
+//            if (null != album.thumb) binding.albumThumb.setImageBitmap(
+//                    BitmapFactory.decodeByteArray(album.thumb, 0, album.thumb.length)
+//            );
         });
 
         binding.albumThumb.setOnClickListener(v -> {

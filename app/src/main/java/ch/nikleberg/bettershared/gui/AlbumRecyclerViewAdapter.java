@@ -1,6 +1,5 @@
 package ch.nikleberg.bettershared.gui;
 
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,13 +44,13 @@ class AlbumRecyclerViewAdapter extends ListAdapter<Album, AlbumRecyclerViewAdapt
         public void bindTo(Album album) {
             binding.albumName.setText(album.name);
             binding.albumPath.setText(album.path);
-            binding.albumCount.setText("(" + album.count + ")");
-            if (null != album.thumb) binding.albumThumb.setImageBitmap(
-                    BitmapFactory.decodeByteArray(album.thumb, 0, album.thumb.length)
-            );
+            binding.albumCount.setText("(" + album.mediaCount + ")");
+//            if (null != album.thumb) binding.albumThumb.setImageBitmap(
+//                    BitmapFactory.decodeByteArray(album.thumb, 0, album.thumb.length)
+//            );
             // overwrite transition name, must be unique to allow return animation of shared elements
-            binding.albumName.setTransitionName("album_name_" + album.id);
-            binding.albumThumb.setTransitionName("album_thumb_" + album.id);
+            binding.albumName.setTransitionName("album_name_" + album._id);
+            binding.albumThumb.setTransitionName("album_thumb_" + album._id);
         }
 
         private void onAlbumClick(View view) {
@@ -75,7 +74,7 @@ class AlbumRecyclerViewAdapter extends ListAdapter<Album, AlbumRecyclerViewAdapt
     public static final DiffUtil.ItemCallback<Album> DIFF_CALLBACK = new DiffUtil.ItemCallback<>() {
         @Override
         public boolean areItemsTheSame(@NonNull Album oldAlbum, @NonNull Album newAlbum) {
-            return oldAlbum.id == newAlbum.id;
+            return oldAlbum._id == newAlbum._id;
         }
 
         @Override

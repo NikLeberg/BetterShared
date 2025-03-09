@@ -154,7 +154,7 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
                 .addSharedElement(binding.albumThumb, "album_thumb")
                 .build();
         Bundle args = new Bundle();
-        args.putLong("album_id", adapter.get(position).id);
+        args.putLong("album_id", adapter.get(position)._id);
         Navigation.findNavController(binding.getRoot()).navigate(R.id.action_albumListFragment_to_albumEditFragment,
                 args, null, extras);
     }
