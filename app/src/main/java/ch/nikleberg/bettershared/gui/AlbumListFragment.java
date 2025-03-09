@@ -12,6 +12,7 @@ import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.FragmentNavigator;
@@ -21,7 +22,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.microsoft.graph.serviceclient.GraphServiceClient;
 
+import java.util.List;
+
 import ch.nikleberg.bettershared.R;
+import ch.nikleberg.bettershared.data.Album;
 import ch.nikleberg.bettershared.data.AlbumRepository;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumItemBinding;
 import ch.nikleberg.bettershared.databinding.FragmentAlbumListBinding;
@@ -29,6 +33,7 @@ import ch.nikleberg.bettershared.model.AlbumListModel;
 import ch.nikleberg.bettershared.ms.DriveUtils;
 import ch.nikleberg.bettershared.ms.auth.Auth;
 import ch.nikleberg.bettershared.ms.auth.AuthProvider;
+import ch.nikleberg.bettershared.work.SyncManager;
 
 public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdapter.AlbumClickListener {
 
@@ -59,7 +64,9 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         Bundle args = getArguments();
         String folderId = null;
         if (null != args) folderId = args.getString("new_album_folder_id");
-        if (null != folderId) model.add(folderId);
+        if (null != folderId) {
+            addAndSync(folderId);
+        }
     }
 
     @Override
@@ -164,5 +171,25 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         args.putString("folder_id", "");
         Navigation.findNavController(binding.getRoot()).navigate(R.id.action_albumListFragment_to_folderListFragment,
                 args, null);
+    }
+
+    private void addAndSync(String folderId) {
+        // Trigger sync via LiveData observer, otherwise the asynchronously inserted album by the
+        // model would not be (yet) visible when the SyncWorker runs. The observer immediately runs
+        // on registration, only do any actual sync on the second invocation.
+        Observer<List<Album>> observer = new Observer<>() {
+            private int called = 0;
+
+            @Override
+            public void onChanged(List<Album> albums) {
+                called++;
+                if (2 <= called) {
+                    SyncManager.getInstance(requireContext()).syncNow();
+                    model.getAlbums().removeObserver(this);
+                }
+            }
+        };
+        model.getAlbums().observeForever(observer);
+        model.add(folderId);
     }
 }
