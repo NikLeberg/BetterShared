@@ -1,6 +1,7 @@
 package ch.nikleberg.bettershared.ms;
 
 import android.util.Log;
+import android.util.Pair;
 
 import androidx.annotation.NonNull;
 
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 
 public class GraphUtils {
@@ -30,15 +32,12 @@ public class GraphUtils {
         return CompletableFuture.supplyAsync(supplier);
     }
 
-    public static <TEntity extends Parsable, TCollectionPage extends Parsable & AdditionalDataHolder> List<TEntity> getPaged(
+    public static <TEntity extends Parsable, TCollectionPage extends Parsable & AdditionalDataHolder> Pair<List<TEntity>, String> getPaged(
             @NonNull GraphServiceClient gc,
             TCollectionPage pageResponse,
             @NonNull List<TEntity> list,
             @NonNull ParsableFactory<TCollectionPage> collectionPageFactory
     ) {
-        if (null == pageResponse) {
-            return list;
-        }
         try {
             PageIterator<TEntity, TCollectionPage> pageIterator =
                     new PageIterator.Builder<TEntity, TCollectionPage>()
@@ -50,10 +49,17 @@ public class GraphUtils {
                                 return true;
                             }).build();
             pageIterator.iterate();
+            String deltaToken = null;
+            String deltaLink = pageIterator.getDeltaLink();
+            if (null != deltaLink) {
+                HttpUrl deltaUrl = HttpUrl.parse(deltaLink);
+                deltaToken = (null != deltaUrl) ? deltaUrl.queryParameter("token") : null;
+            }
+            return Pair.create(list, deltaToken);
         } catch (Exception e) {
             Log.d(TAG, e.getMessage(), e);
+            return Pair.create(list, "");
         }
-        return list;
     }
 
     public static <TEntity extends Parsable, TCollectionPage extends Parsable & AdditionalDataHolder> CompletableFuture<List<TEntity>> getPagedAsync(
@@ -62,7 +68,7 @@ public class GraphUtils {
             @NonNull List<TEntity> list,
             @NonNull ParsableFactory<TCollectionPage> collectionPageFactory
     ) {
-        return pageResponse.thenCompose(page -> CompletableFuture.supplyAsync(() -> getPaged(gc, page, list, collectionPageFactory)));
+        return pageResponse.thenCompose(page -> CompletableFuture.supplyAsync(() -> getPaged(gc, page, list, collectionPageFactory).first));
     }
 
     public static <TEntity extends Parsable, TCollectionPage extends Parsable & AdditionalDataHolder> CompletableFuture<List<TEntity>> getPagedAsync(
@@ -72,6 +78,15 @@ public class GraphUtils {
             @NonNull ParsableFactory<TCollectionPage> collectionPageFactory
     ) {
         return getPagedAsync(gc, CompletableFuture.supplyAsync(pageSupplier), list, collectionPageFactory);
+    }
+
+    public static <TEntity extends Parsable, TCollectionPage extends Parsable & AdditionalDataHolder> Pair<List<TEntity>, String> getPagedWithDelta(
+            @NonNull GraphServiceClient gc,
+            TCollectionPage pageResponse,
+            @NonNull List<TEntity> list,
+            @NonNull ParsableFactory<TCollectionPage> collectionPageFactory
+    ) {
+        return getPaged(gc, pageResponse, list, collectionPageFactory);
     }
 
     public static class Factory {
