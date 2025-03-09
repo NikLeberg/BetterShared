@@ -1,5 +1,6 @@
 package ch.nikleberg.bettershared.data;
 
+import android.provider.CloudMediaProviderContract;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -7,57 +8,48 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 @Entity(tableName = "album")
 public class Album {
     @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    public long id;
+    public long _id = 0;
 
-    @ColumnInfo(name = "name")
-    public String name;
+    @ColumnInfo(name = CloudMediaProviderContract.AlbumColumns.DISPLAY_NAME)
+    public String name = null;
+
+    @ColumnInfo(name = CloudMediaProviderContract.AlbumColumns.DATE_TAKEN_MILLIS)
+    public long dateTaken = 0;
+
+    @ColumnInfo(name = CloudMediaProviderContract.AlbumColumns.MEDIA_COUNT)
+    public long mediaCount = 0;
+
+    @ColumnInfo(name = CloudMediaProviderContract.AlbumColumns.MEDIA_COVER_ID)
+    public String mediaCoverId = null;
 
     @ColumnInfo(name = "path")
-    public String path;
-
-    @ColumnInfo(name = "thumb")
-    public byte[] thumb;
-
-    @ColumnInfo(name = "count")
-    public long count;
+    public String path = null;
 
     @ColumnInfo(name = "drive_id")
-    public String driveId;
+    public String driveId = null;
 
     @ColumnInfo(name = "item_id")
-    public String itemId;
+    public String itemId = null;
 
-    @Ignore
-    public Album() {
-        this(0, "", "", null, 0, "", "");
-    }
-
-    public Album(long id, String name, String path, byte[] thumb, long count, String driveId, String itemId) {
-        this.id = id;
-        this.name = name;
-        this.path = path;
-        this.thumb = thumb;
-        this.count = count;
-        this.driveId = driveId;
-        this.itemId = itemId;
-    }
+    @ColumnInfo(name = "delta_token")
+    public String deltaToken = null;
 
     @Ignore
     public boolean equals(@NonNull Album album) {
-        return (id == album.id &&
+        return (_id == album._id &&
                 Objects.equals(name, album.name) &&
+                dateTaken == album.dateTaken &&
+                mediaCount == album.mediaCount &&
+                Objects.equals(mediaCoverId, album.mediaCoverId) &&
                 Objects.equals(path, album.path) &&
-                Arrays.equals(thumb, album.thumb) &&
-                count == album.count &&
                 Objects.equals(driveId, album.driveId) &&
-                Objects.equals(itemId, album.itemId)
+                Objects.equals(itemId, album.itemId) &&
+                Objects.equals(deltaToken, album.deltaToken)
         );
     }
 }
