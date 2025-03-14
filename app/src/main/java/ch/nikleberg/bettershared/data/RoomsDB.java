@@ -6,13 +6,13 @@ import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {Album.class, Media.class},
+@Database(entities = {Album.class, Media.class, Cache.class},
         views = {CloudProviderViews.AlbumView.class, CloudProviderViews.MediaView.class},
-        version = 10)
+        version = 13)
 public abstract class RoomsDB extends RoomDatabase {
     public abstract AlbumDao albumDao();
-
     public abstract MediaDao mediaDao();
+    public abstract CacheDao cacheDao();
 
     private static volatile RoomsDB INSTANCE;
 
