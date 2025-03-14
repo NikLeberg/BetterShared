@@ -21,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -43,6 +42,7 @@ public class ProviderRepository {
     private final Auth auth;
     private final GraphServiceClient graph;
     private final File cacheDir;
+    private final CacheManager cacheManager;
 
     public ProviderRepository(@NonNull Context context) {
         RoomsDB db = RoomsDB.getDatabase(context);
@@ -50,6 +50,7 @@ public class ProviderRepository {
         this.mediaDao = db.mediaDao();
         this.prefs = PreferenceManager.getDefaultSharedPreferences(context);
         this.cacheDir = context.getCacheDir();
+        this.cacheManager = new CacheManager(db.cacheDao());
 
         this.auth = Auth.getInstance(context.getApplicationContext(), DriveUtils.DRIVE_SCOPES);
         this.graph = new GraphServiceClient(new AuthProvider(auth));
@@ -101,19 +102,14 @@ public class ProviderRepository {
         return mediaDao.getDeletedMedias();
     }
 
-    public AssetFileDescriptor getMediaPreview(String mediaId, int width, int height, CancellationSignal cancel) throws FileNotFoundException {
-        Log.d(TAG, "getMediaPreview: " + mediaId + ", " + width + "x" + height);
+    public AssetFileDescriptor openMediaPreview(String mediaId, int width, int height, CancellationSignal cancel) throws FileNotFoundException {
+        Log.d(TAG, "openMediaPreview: " + mediaId + ", " + width + "x" + height);
         long id = CloudProviderViews.stringIdToLongId(mediaId);
         Media media = getMediaByIdOrThrow(id);
 
-        if (haveMatchingCachedPreview(media, width, height)) {
-            if (cachedPreviewExists(media)) {
-                return serveCachedPreview(media.previewAssetPath);
-            } else {
-                media.previewAssetPath = null;
-                media.previewAssetDimension = 0;
-                mediaDao.update(media);
-            }
+        File cached = cacheManager.get(media._id, width * height);
+        if (null != cached) {
+            return servePreview(cached);
         }
 
         String url = DriveUtils.getDriveItemThumbnailUrl(graph, media.driveId, media.itemId, width, height);
@@ -126,26 +122,44 @@ public class ProviderRepository {
             throw ex;
         }
 
-        if (shouldCachePreview(media)) {
-            return downloadPreview(media, width, height, urlObj, cancel);
-        } else {
-            return streamPreview(urlObj, cancel);
-        }
-    }
-
-    public ParcelFileDescriptor getMedia(String mediaId, CancellationSignal cancel) throws FileNotFoundException {
-        Log.d(TAG, "getMedia: " + mediaId);
-        long id = CloudProviderViews.stringIdToLongId(mediaId);
-        Media media = getMediaByIdOrThrow(id);
-
-        InputStream in = DriveUtils.getDriveItemContent(graph, media.driveId, media.itemId);
+        String filename = "preview_" + media._id + "_" + width + "x" + height;
+        File file = new File(cacheDir, filename);
         try {
-            return streamFile(in, cancel);
+            downloadFile(urlObj, file, cancel);
         } catch (IOException e) {
-            FileNotFoundException ex = new FileNotFoundException("Streaming of media failed");
+            FileNotFoundException ex = new FileNotFoundException("Download of preview media failed");
             ex.initCause(e);
             throw ex;
         }
+        cacheManager.put(media._id, width * height, file.getPath());
+
+        return servePreview(file);
+    }
+
+    public ParcelFileDescriptor openMedia(String mediaId, CancellationSignal cancel) throws FileNotFoundException {
+        Log.d(TAG, "openMedia: " + mediaId);
+        long id = CloudProviderViews.stringIdToLongId(mediaId);
+        Media media = getMediaByIdOrThrow(id);
+
+        File cached = cacheManager.get(media._id, 0);
+        if (null != cached) {
+            return serveMedia(cached);
+        }
+
+        InputStream in = DriveUtils.getDriveItemContent(graph, media.driveId, media.itemId);
+        String filename = "media_" + media._id;
+        File file = new File(cacheDir, filename);
+
+        try {
+            downloadFile(in, file, cancel);
+        } catch (IOException e) {
+            FileNotFoundException ex = new FileNotFoundException("Download of media failed");
+            ex.initCause(e);
+            throw ex;
+        }
+        cacheManager.put(media._id, 0, file.getPath());
+
+        return serveMedia(file);
     }
 
     private Media getMediaByIdOrThrow(long id) throws FileNotFoundException {
@@ -156,88 +170,41 @@ public class ProviderRepository {
         return media;
     }
 
-    private boolean haveMatchingCachedPreview(Media media, int width, int height) {
-        return ((null != media)
-                && (null != media.previewAssetPath)
-                && (width * height == media.previewAssetDimension));
+    private AssetFileDescriptor servePreview(File preview) throws FileNotFoundException {
+        ParcelFileDescriptor pfd = ParcelFileDescriptor.open(preview, ParcelFileDescriptor.MODE_READ_ONLY);
+        return new AssetFileDescriptor(pfd, 0, preview.length());
     }
 
-    private boolean cachedPreviewExists(Media media) {
-        return ((null != media) && ((new File(media.previewAssetPath)).exists()));
-    }
-
-    private AssetFileDescriptor serveCachedPreview(String path) throws FileNotFoundException {
-        File f = new File(path);
-        ParcelFileDescriptor pfd = ParcelFileDescriptor.open(f, ParcelFileDescriptor.MODE_READ_ONLY);
-        return new AssetFileDescriptor(pfd, 0, f.length());
-    }
-
-    private boolean shouldCachePreview(Media media) {
-        return (null == media.previewAssetPath);
-    }
-
-    private AssetFileDescriptor downloadPreview(Media media, int width, int height, URL url, @Nullable CancellationSignal cancel) throws FileNotFoundException {
-        String filename = "preview_" + media._id + "_" + width + "x" + height + ".jpeg";
-        File file = new File(cacheDir, filename);
-        try {
-            downloadFile(url, file, cancel);
-        } catch (IOException e) {
-            FileNotFoundException ex = new FileNotFoundException("Download of preview media failed");
-            ex.initCause(e);
-            throw ex;
-        }
-        String path = file.getPath();
-        media.previewAssetPath = path;
-        media.previewAssetDimension = width * height;
-        mediaDao.update(media);
-        return serveCachedPreview(path);
-    }
-
-    private AssetFileDescriptor streamPreview(URL url, CancellationSignal cancel) throws FileNotFoundException {
-        try {
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setConnectTimeout(10 * 1000);
-            connection.setReadTimeout(10 * 1000);
-            connection.connect();
-
-            if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-                throw new IOException("HTTP error: " + connection.getResponseCode());
-            }
-
-            InputStream in = new BufferedInputStream(connection.getInputStream());
-            ParcelFileDescriptor pfd = streamFile(in, cancel);
-            return new AssetFileDescriptor(pfd, 0, AssetFileDescriptor.UNKNOWN_LENGTH);
-        } catch (IOException e) {
-            FileNotFoundException ex = new FileNotFoundException("Streaming of preview media failed");
-            ex.initCause(e);
-            throw ex;
-        }
+    private ParcelFileDescriptor serveMedia(File media) throws FileNotFoundException {
+        return ParcelFileDescriptor.open(media, ParcelFileDescriptor.MODE_READ_ONLY);
     }
 
     private void downloadFile(URL url, File outputFile, @Nullable CancellationSignal cancel) throws IOException {
         HttpURLConnection connection = null;
-        InputStream in = null;
-        FileOutputStream out = null;
-
         try {
             connection = (HttpURLConnection) url.openConnection();
             connection.setConnectTimeout(10 * 1000);
             connection.setReadTimeout(10 * 1000);
             connection.connect();
-
             if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
                 throw new IOException("HTTP error: " + connection.getResponseCode());
             }
 
-            in = new BufferedInputStream(connection.getInputStream());
-            out = new FileOutputStream(outputFile);
+            InputStream in = new BufferedInputStream(connection.getInputStream());
+            downloadFile(in, outputFile, cancel);
+        } finally {
+            if (null != connection) connection.disconnect();
+        }
+    }
 
+    private void downloadFile(InputStream in, File outputFile, @Nullable CancellationSignal cancel) throws IOException {
+        try (in; FileOutputStream out = new FileOutputStream(outputFile)) {
             byte[] buffer = new byte[4096]; // 4kb
             int bytesRead;
             while ((bytesRead = in.read(buffer)) != -1) {
                 if (cancel != null && cancel.isCanceled()) {
                     if (!outputFile.delete()) {
-                        Log.e(TAG, "Failed to delete preview file: " + outputFile.getPath());
+                        Log.e(TAG, "Failed to delete file: " + outputFile.getPath());
                     }
                     Log.d(TAG, "Download canceled");
                     throw new IOException("Download canceled");
@@ -245,34 +212,6 @@ public class ProviderRepository {
                 out.write(buffer, 0, bytesRead);
             }
             out.flush();
-        } finally {
-            if (null != out) out.close();
-            if (null != in) in.close();
-            if (null != connection) connection.disconnect();
         }
-    }
-
-    private ParcelFileDescriptor streamFile(InputStream in, @Nullable CancellationSignal cancel) throws IOException {
-        ParcelFileDescriptor[] pipe = ParcelFileDescriptor.createPipe();
-        ParcelFileDescriptor readSide = pipe[0];
-        final ParcelFileDescriptor writeSide = pipe[1];
-
-        new Thread(() -> {
-            try (OutputStream out = new ParcelFileDescriptor.AutoCloseOutputStream(writeSide); in) {
-                byte[] buffer = new byte[4096]; // 4kb
-                int bytesRead;
-                while ((bytesRead = in.read(buffer)) != -1) {
-                    if (cancel != null && cancel.isCanceled()) {
-                        Log.d(TAG, "Streaming canceled");
-                        return;
-                    }
-                    out.write(buffer, 0, bytesRead);
-                }
-            } catch (IOException e) {
-                Log.e(TAG, "Error streaming preview", e);
-            }
-        }).start();
-
-        return readSide;
     }
 }

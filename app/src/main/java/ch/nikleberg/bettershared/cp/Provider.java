@@ -175,7 +175,7 @@ public class Provider extends CloudMediaProvider {
         }
 
         try {
-            return repo.getMediaPreview(mediaId, size.x, size.y, cancel);
+            return repo.openMediaPreview(mediaId, size.x, size.y, cancel);
         } catch (FileNotFoundException e) {
             Log.e(TAG, "onOpenPreview exit with exception", e);
             throw e;
@@ -188,7 +188,7 @@ public class Provider extends CloudMediaProvider {
         logMethodCall("onOpenMedia", extras);
         throwIfNotLoggedIn();
 
-        return repo.getMedia(mediaId, cancel);
+        return repo.openMedia(mediaId, cancel);
     }
 
     private void logMethodCall(String name, Bundle extras) {

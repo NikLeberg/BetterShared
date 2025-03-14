@@ -54,10 +54,4 @@ public class Media {
 
     @ColumnInfo(name = "item_id", index = true)
     public String itemId = null;
-
-    @ColumnInfo(name = "preview_asset_path")
-    public String previewAssetPath = null;
-
-    @ColumnInfo(name = "preview_asset_dimension")
-    public int previewAssetDimension = 0;
 }
