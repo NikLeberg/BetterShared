@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.graphics.Point;
 import android.os.Build;
 import android.os.Bundle;
@@ -99,7 +98,6 @@ public class Provider extends CloudMediaProvider {
         Bundle bundle = new Bundle();
         bundle.putString(CloudMediaProviderContract.EXTRA_MEDIA_COLLECTION_ID, repo.getMediaCollectionId());
         cursor.setExtras(bundle);
-        Log.d(TAG, "onQueryAlbums cursor: " + DatabaseUtils.dumpCursorToString(cursor));
         return cursor;
     }
 
@@ -132,7 +130,6 @@ public class Provider extends CloudMediaProvider {
         }
 
         Cursor cursor = (albumId == null) ? repo.getMedias() : repo.getMediasByAlbumId(albumId);
-        Log.d(TAG, "onQueryMedia cursor: " + DatabaseUtils.dumpCursorToString(cursor));
 
         Bundle bundle = new Bundle();
         bundle.putString(CloudMediaProviderContract.EXTRA_MEDIA_COLLECTION_ID, repo.getMediaCollectionId());
