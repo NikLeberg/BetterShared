@@ -47,7 +47,7 @@ public class Media {
     public long syncGeneration = 0;
 
     @ColumnInfo(name = "album_id", index = true)
-    public Long albumId = 0L;
+    public Long albumId = null;
 
     @ColumnInfo(name = "drive_id")
     public String driveId = null;

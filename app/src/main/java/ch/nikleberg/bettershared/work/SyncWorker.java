@@ -52,26 +52,28 @@ public class SyncWorker extends Worker {
             Pair<List<DriveItem>, String> itemsAndDelta =
                     DriveUtils.getDriveItemsWithDelta(graph, album.driveId, album.itemId, album.deltaToken, DriveUtils.SELECT_DRIVE_ITEMS_DELTA);
             album.deltaToken = itemsAndDelta.second;
+            album.mediaCount += processItems(itemsAndDelta.first, album);
             albumDao.update(album);
-            processItems(itemsAndDelta.first, album);
         }
 
         Log.d(TAG, "did the work");
         return Result.success();
     }
 
-    private void processItems(List<DriveItem> items, Album album) {
+    private int processItems(List<DriveItem> items, Album album) {
+        int countDiff = 0;
         for (DriveItem item : items) {
-            processItem(item, album);
+            countDiff += processItem(item, album);
         }
+        return countDiff;
     }
 
-    private void processItem(DriveItem item, Album album) {
-        if (null != item.getFolder()) return;
+    private int processItem(DriveItem item, Album album) {
+        if (null != item.getFolder()) return 0;
 
         Image image = item.getImage();
         Video video = item.getVideo();
-        if (null == image && null == video) return;
+        if (null == image && null == video) return 0;
 
         Media media = mediaDao.getMediaByItemId(item.getId());
         if (null == media) {
@@ -79,6 +81,14 @@ public class SyncWorker extends Worker {
             media = new Media();
         } else {
             Log.d(TAG, "syncing updated media: " + item.getId() + " (id: " + media._id + ")");
+        }
+
+        if (null != item.getDeleted()) {
+            media.albumId = null;
+            media.syncGeneration = newSyncGeneration;
+            mediaDao.update(media);
+            Log.d(TAG, "deleted media: " + item.getId() + " (id: " + media._id + ")");
+            return -1;
         }
 
         media.size = item.getSize();
@@ -103,8 +113,10 @@ public class SyncWorker extends Worker {
 
         if (0 == media._id) {
             mediaDao.insert(media);
+            return 1;
         } else {
             mediaDao.update(media);
+            return 0;
         }
     }
 }

@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 
 @Database(entities = {Album.class, Media.class, Cache.class},
         views = {CloudProviderViews.AlbumView.class, CloudProviderViews.MediaView.class},
-        version = 13)
+        version = 15)
 public abstract class RoomsDB extends RoomDatabase {
     public abstract AlbumDao albumDao();
     public abstract MediaDao mediaDao();

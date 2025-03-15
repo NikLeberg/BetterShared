@@ -13,16 +13,16 @@ import java.util.Objects;
 @Entity(tableName = "album")
 public class Album {
     @PrimaryKey(autoGenerate = true)
-    public long _id = 0;
+    public long _id = 0L;
 
     @ColumnInfo(name = CloudMediaProviderContract.AlbumColumns.DISPLAY_NAME)
     public String name = null;
 
     @ColumnInfo(name = CloudMediaProviderContract.AlbumColumns.DATE_TAKEN_MILLIS)
-    public long dateTaken = 0;
+    public long dateTaken = 0L;
 
     @ColumnInfo(name = CloudMediaProviderContract.AlbumColumns.MEDIA_COUNT)
-    public long mediaCount = 0;
+    public long mediaCount = 0L;
 
     @ColumnInfo(name = CloudMediaProviderContract.AlbumColumns.MEDIA_COVER_ID)
     public String mediaCoverId = null;

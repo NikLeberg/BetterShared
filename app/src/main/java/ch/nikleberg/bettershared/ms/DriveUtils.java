@@ -26,7 +26,7 @@ public class DriveUtils {
     public static final List<String> SELECT_DRIVE_ITEMS_FOLDERS = List.of("id", "name", "folder");
     public static final List<String> SELECT_DRIVE_ITEM_FOLDER = List.of("id", "name", "folder", "createdDateTime", "parentReference");
     public static final List<String> SELECT_DRIVE_ITEMS_FILES = List.of("id", "name", "file");
-    public static final List<String> SELECT_DRIVE_ITEMS_DELTA = List.of("id", "name", "size", "createdDateTime", "folder", "file", "image", "video");
+    public static final List<String> SELECT_DRIVE_ITEMS_DELTA = List.of("id", "name", "size", "createdDateTime", "folder", "file", "image", "video", "deleted");
 
     private DriveUtils() {
     }

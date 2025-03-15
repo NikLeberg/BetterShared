@@ -48,16 +48,13 @@ public class AlbumRepository {
                 album.driveId = ids[0];
                 album.itemId = ids[1];
 
+                // media count is updated by the sync worker when media items are synced
+
                 OffsetDateTime dateTime = item.getCreatedDateTime();
                 if (null != dateTime) {
                     album.dateTaken = dateTime.toEpochSecond() * 1000;
                 }
 
-                com.microsoft.graph.models.Folder folder = item.getFolder();
-                Integer count;
-                if ((null != folder) && (null != (count = folder.getChildCount()))) {
-                    album.mediaCount = count;
-                }
 
                 ItemReference reference = item.getParentReference();
                 if (null != reference) {
