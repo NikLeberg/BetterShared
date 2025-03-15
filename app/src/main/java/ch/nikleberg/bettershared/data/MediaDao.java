@@ -17,10 +17,10 @@ public interface MediaDao {
     @Query("SELECT * FROM mediaview WHERE album_id = (:albumId)")
     Cursor getMediasByAlbumId(long albumId);
 
-    @Query("SELECT * FROM media WHERE _id = (:mediaId)")
+    @Query("SELECT * FROM media WHERE _id = (:mediaId) AND album_id IS NOT NULL")
     Media getMediaById(long mediaId);
 
-    @Query("SELECT * FROM media WHERE item_id = (:itemId)")
+    @Query("SELECT * FROM media WHERE item_id = (:itemId) AND album_id IS NOT NULL")
     Media getMediaByItemId(String itemId);
 
     @Query("SELECT MAX(sync_generation) FROM media")
