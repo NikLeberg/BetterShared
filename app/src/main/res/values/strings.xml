@@ -18,4 +18,5 @@
     <string name="fragment_folder_list_label">Choose Folder for Album</string>
     <string name="fragment_album_list_empty_message">No albums configured.</string>
     <string name="fragment_folder_list_empty_message">No more subfolders.</string>
+    <string name="menu_album_list_sync_now">Sync now</string>"
 </resources>

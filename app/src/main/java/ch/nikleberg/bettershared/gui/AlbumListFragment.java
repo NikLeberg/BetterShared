@@ -6,12 +6,17 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 
 import androidx.annotation.NonNull;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -87,6 +92,7 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         model.getAlbums().observe(getViewLifecycleOwner(), albums -> adapter.submitList(albums));
 
         installItemSwipeHandler();
+        installMenuOptions();
     }
 
     @Override
@@ -154,6 +160,24 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
         helper.attachToRecyclerView(binding.albumRecycler);
     }
 
+    private void installMenuOptions() {
+        binding.toolBar.addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+                inflater.inflate(R.menu.menu_album_list, menu);
+            }
+
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem item) {
+                if (item.getItemId() == R.id.menu_album_list_sync_now) {
+                    triggerSync();
+                    return true;
+                }
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
+    }
+
     @Override
     public void onAlbumClick(int position, FragmentAlbumItemBinding binding) {
         FragmentNavigator.Extras extras = new FragmentNavigator.Extras.Builder()
@@ -184,12 +208,16 @@ public class AlbumListFragment extends Fragment implements AlbumRecyclerViewAdap
             public void onChanged(List<Album> albums) {
                 called++;
                 if (2 <= called) {
-                    SyncManager.getInstance(requireContext()).syncNow();
+                    triggerSync();
                     model.getAlbums().removeObserver(this);
                 }
             }
         };
         model.getAlbums().observeForever(observer);
         model.add(folderId);
+    }
+
+    private void triggerSync() {
+        SyncManager.getInstance(requireContext()).syncNow();
     }
 }
