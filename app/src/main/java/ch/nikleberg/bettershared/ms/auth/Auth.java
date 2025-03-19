@@ -35,6 +35,8 @@ public class Auth implements TokenProvider {
     private ISingleAccountPublicClientApplication app = null;
     private IAccount account = null;
     private IAuthenticationResult accessToken = null;
+    private CompletableFuture<Void> silentFuture = null;
+    private CompletableFuture<Void> interactiveFuture = null;
 
     private Auth(Context context, List<String> scopes) {
         this.appContext = context;
@@ -56,7 +58,14 @@ public class Auth implements TokenProvider {
         return (null != accessToken);
     }
 
-    public CompletableFuture<Void> authenticateSilent() {
+    public synchronized CompletableFuture<Void> authenticateSilent() {
+        if (null == silentFuture || silentFuture.isDone()) {
+            silentFuture = authenticateSilentInternal();
+        }
+        return silentFuture;
+    }
+
+    private CompletableFuture<Void> authenticateSilentInternal() {
         return CompletableFuture.supplyAsync(() -> {
             createApp();
             loadAccount();
@@ -85,7 +94,14 @@ public class Auth implements TokenProvider {
         });
     }
 
-    public CompletableFuture<Void> authenticateInteractive(Activity parentActivity) {
+    public synchronized CompletableFuture<Void> authenticateInteractive(Activity parentActivity) {
+        if (null == interactiveFuture || interactiveFuture.isDone()) {
+            interactiveFuture = authenticateInteractiveInternal(parentActivity);
+        }
+        return interactiveFuture;
+    }
+
+    private CompletableFuture<Void> authenticateInteractiveInternal(Activity parentActivity) {
         return CompletableFuture.supplyAsync(() -> {
             createApp();
             return null;

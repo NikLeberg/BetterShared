@@ -25,6 +25,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import ch.nikleberg.bettershared.ms.DriveUtils;
 import ch.nikleberg.bettershared.ms.auth.Auth;
@@ -66,6 +69,16 @@ public class ProviderRepository {
 
     public boolean isLoggedIn() {
         return auth.isAuthenticated();
+    }
+
+    public void loginWithTimeout(long timeout) throws TimeoutException {
+        try {
+            auth.authenticateSilent().get(timeout, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public String getMediaCollectionId() {

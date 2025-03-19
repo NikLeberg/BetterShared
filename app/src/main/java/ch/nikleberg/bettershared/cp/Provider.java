@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.concurrent.TimeoutException;
 
 import ch.nikleberg.bettershared.data.ProviderRepository;
 import ch.nikleberg.bettershared.gui.MainActivity;
@@ -55,6 +56,10 @@ import ch.nikleberg.bettershared.gui.MainActivity;
 public class Provider extends CloudMediaProvider {
     private static final String TAG = Provider.class.getSimpleName();
 
+    private static final long API_TIMEOUT_GET_INFO = 100;
+    private static final long API_TIMEOUT_OPEN_PREVIEW = 500;
+    private static final long API_TIMEOUT_OPEN_MEDIA = 500;
+
     private ProviderRepository repo = null;
     private Intent configIntent = null;
 
@@ -71,13 +76,18 @@ public class Provider extends CloudMediaProvider {
     public Bundle onGetMediaCollectionInfo(@NonNull Bundle extras) {
         logMethodCall("onGetMediaCollectionInfo", extras);
 
-        Bundle info = new Bundle();
-        if (!repo.isLoggedIn()) return info;
+        try {
+            loginOrThrow(API_TIMEOUT_GET_INFO);
+        } catch (IllegalStateException e) {
+            Log.w(TAG, "Could not log in", e);
+        }
 
+        Bundle info = new Bundle();
         info.putString(CloudMediaProviderContract.MediaCollectionInfo.MEDIA_COLLECTION_ID, repo.getMediaCollectionId());
         info.putLong(CloudMediaProviderContract.MediaCollectionInfo.LAST_MEDIA_SYNC_GENERATION, repo.getSyncGeneration());
         info.putString(CloudMediaProviderContract.MediaCollectionInfo.ACCOUNT_NAME, repo.getAccountName());
         info.putParcelable(CloudMediaProviderContract.MediaCollectionInfo.ACCOUNT_CONFIGURATION_INTENT, configIntent);
+        logMethodCall("onGetMediaCollectionInfo", info);
 
         return info;
     }
@@ -92,7 +102,6 @@ public class Provider extends CloudMediaProvider {
         // TODO: handle extra ??? CloudMediaProviderContract.EXTRA_ALBUM_ID
         // TODO: handle extra ??? CloudMediaProviderContract.EXTRA_SIZE_LIMIT_BYTES
         logMethodCall("onQueryAlbums", extras);
-        throwIfNotLoggedIn();
 
         Cursor cursor = repo.getAlbums();
         Bundle bundle = new Bundle();
@@ -108,7 +117,7 @@ public class Provider extends CloudMediaProvider {
         // TODO: handle extra CloudMediaProviderContract.EXTRA_PAGE_TOKEN
         // TODO: handle extra CloudMediaProviderContract.EXTRA_PAGE_SIZE
         logMethodCall("onQueryMedia", extras);
-        throwIfNotLoggedIn();
+
         ArrayList<String> honored = new ArrayList<>();
         long syncGeneration = extras.getLong(CloudMediaProviderContract.EXTRA_SYNC_GENERATION, -1);
         if (-1 != syncGeneration) {
@@ -143,7 +152,6 @@ public class Provider extends CloudMediaProvider {
     @Override
     public Cursor onQueryDeletedMedia(@NonNull Bundle extras) {
         logMethodCall("onQueryDeletedMedia", extras);
-        throwIfNotLoggedIn();
 
         Cursor cursor = repo.getDeletedMedias();
 
@@ -158,7 +166,7 @@ public class Provider extends CloudMediaProvider {
     @Override
     public AssetFileDescriptor onOpenPreview(@NonNull String mediaId, @NonNull Point size, @Nullable Bundle extras, @Nullable CancellationSignal cancel) throws FileNotFoundException {
         logMethodCall("onOpenPreview", extras);
-        throwIfNotLoggedIn();
+        loginOrThrow(API_TIMEOUT_OPEN_PREVIEW);
 
         if (null != extras) {
             if (extras.containsKey(CloudMediaProviderContract.EXTRA_PREVIEW_THUMBNAIL)) {
@@ -183,7 +191,7 @@ public class Provider extends CloudMediaProvider {
     @Override
     public ParcelFileDescriptor onOpenMedia(@NonNull String mediaId, @Nullable Bundle extras, @Nullable CancellationSignal cancel) throws FileNotFoundException {
         logMethodCall("onOpenMedia", extras);
-        throwIfNotLoggedIn();
+        loginOrThrow(API_TIMEOUT_OPEN_MEDIA);
 
         return repo.openMedia(mediaId, cancel);
     }
@@ -197,9 +205,12 @@ public class Provider extends CloudMediaProvider {
         }
     }
 
-    private void throwIfNotLoggedIn() throws IllegalStateException {
-        if (!repo.isLoggedIn()) {
-            throw new IllegalStateException("Not logged in");
+    private void loginOrThrow(long timeout) throws IllegalStateException {
+        if (repo.isLoggedIn()) return;
+        try {
+            repo.loginWithTimeout(timeout);
+        } catch (TimeoutException e) {
+            throw new IllegalStateException("Login timed out", e);
         }
     }
 }
