@@ -24,7 +24,7 @@ public interface MediaDao {
     Media getMediaByItemId(String itemId);
 
     @Query("SELECT MAX(sync_generation) FROM media")
-    int getSyncGeneration();
+    long getSyncGeneration();
 
     @Query("SELECT " + CloudMediaProviderContract.MediaColumns.ID + " FROM mediaview WHERE album_id IS NULL")
     Cursor getDeletedMedias();
